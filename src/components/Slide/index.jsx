@@ -1,37 +1,82 @@
-import { useState } from "react"
-import { motion, AnimatePresence } from "framer-motion"
+import * as React from "react";
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import cls from 'classnames';
+import { wrap } from "popmotion";
+import './style.css'
+import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/16/solid";
 
-export default function Slide({ images }) {
-    const [index, setIndex] = useState(0);
-    const handleClick = (type) => {
-        let idx = type === 'prev' ? index - 1 : index + 1;
-        if (idx <= 0) {
-            return setIndex(images.length - 1)
-        }
-        if (idx > images.length || idx === images.length) {
-            return setIndex(0)
-        }
-        return setIndex(idx);
+const variants = {
+    enter: (direction) => {
+        return {
+            x: direction > 0 ? 1000 : -1000,
+            opacity: 0
+        };
+    },
+    center: {
+        zIndex: 1,
+        x: 0,
+        opacity: 1
+    },
+    exit: (direction) => {
+        return {
+            zIndex: 0,
+            x: direction < 0 ? 1000 : -1000,
+            opacity: 0
+        };
     }
+};
 
-    const image = images[index];
+const swipeConfidenceThreshold = 10000;
+const swipePower = (offset, velocity) => {
+    return Math.abs(offset) * velocity;
+};
+
+const Slide = ({ images, className }) => {
+    const [[page, direction], setPage] = useState([0, 0]);
+    const imageIndex = wrap(0, images.length, page);
+    const paginate = (newDirection) => {
+        setPage([page + newDirection, newDirection]);
+    };
+
     return (
-        <div className="relative w-[400px] overflow-hidden h-[300px]">
-            <div className="relative z-10 space-x-3">
-                <button onClick={() => handleClick('prev')} >prev</button>
-                <button onClick={() => handleClick('next')}>next</button>
-            </div>
-
-            <AnimatePresence>
+        <div className={cls('flex justify-center items-center h-full w-full relative overflow-hidden', className)}>
+            <AnimatePresence initial={false} custom={direction}>
                 <motion.img
-                    key={image.src}
-                    src={image.src}
-                    initial={{ x: 300, opacity: 0 }}
-                    animate={{ x: 0, opacity: 1 }}
-                    exit={{ x: -300, opacity: 0 }}
-                    className="absolute top-0 left-0 bottom-0 right-0"
+                    className="h-full w-full absolute"
+                    key={page}
+                    src={images[imageIndex]}
+                    custom={direction}
+                    variants={variants}
+                    initial="enter"
+                    animate="center"
+                    exit="exit"
+                    transition={{
+                        x: { type: "spring", stiffness: 300, damping: 30 },
+                        opacity: { duration: 0.5 }
+                    }}
+                    drag="x"
+                    dragConstraints={{ left: 0, right: 0 }}
+                    dragElastic={1}
+                    onDragEnd={(_, { offset, velocity }) => {
+                        const swipe = swipePower(offset.x, velocity.x);
+                        if (swipe < -swipeConfidenceThreshold) {
+                            paginate(1);
+                        } else if (swipe > swipeConfidenceThreshold) {
+                            paginate(-1);
+                        }
+                    }}
                 />
             </AnimatePresence>
-        </div >
-    )
-}
+
+            <div className="next" onClick={() => paginate(1)}>
+                <ChevronRightIcon className="h-6" />
+            </div>
+            <div className="prev" onClick={() => paginate(-1)}>
+                <ChevronLeftIcon className="h-6" />
+            </div>
+        </div>
+    );
+};
+
+export default Slide;

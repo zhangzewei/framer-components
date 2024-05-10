@@ -3,48 +3,16 @@ import Slide from './components/Slide'
 import './App.css'
 
 function App() {
-  const images = [{
-    key: '122',
-    src: 'https://w.wallhaven.cc/full/p8/wallhaven-p8vgd3.png'
-  }, {
-    key: '2333',
-    src: 'https://w.wallhaven.cc/full/0j/wallhaven-0j2kq4.jpg'
-  }, {
-    key: '344',
-    src: 'https://w.wallhaven.cc/full/wy/wallhaven-wy5gj7.jpg'
-  }]
+  const images = [
+    'https://pic.rmb.bdstatic.com/bjh/gallery/03e17cba710868d9153176b50a5fca0d1090.jpeg',
+    'https://img0.baidu.com/it/u=2123036823,827931345&fm=253&fmt=auto&app=120&f=JPEG?w=1280&h=800',
+    'https://img1.baidu.com/it/u=1179199327,1946315836&fm=253&fmt=auto&app=138&f=JPEG?w=1364&h=800'
+  ]
   return (
     <div className='flex justify-center items-center'>
-      <Menu
-        list={[
-          {
-            key: '111',
-            text: '1111'
-          }, {
-            key: '111',
-            text: '1111'
-          }, {
-            key: '111',
-            text: '1111'
-          }, {
-            key: '111',
-            text: '1111'
-          }, {
-            key: '111',
-            text: '1111'
-          }, {
-            key: '111',
-            text: '1111'
-          }, {
-            key: '111',
-            text: '1111'
-          }, {
-            key: '111',
-            text: '1111'
-          }
-        ]}
-      >Menu</Menu>
-      <Slide images={images} />
+      <div className='h-[250px] w-[450px]'>
+        <Slide images={images} />
+      </div>
     </div>
   )
 }
